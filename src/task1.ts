@@ -1,4 +1,3 @@
-
 /**
 Задание к TypeScript: Part 2 будет проверять ваше умение использовать и вычислять типы
 Все задания устроены таким образом что в них есть тип FIXME (который any) и ваша задача избавится от него
@@ -10,7 +9,7 @@
 // Нужно заменить FIXME на тип который вычисляется на освове OrderState
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FIXME = Exclude<OrderState, 'buyingSupplies'|'producing'>[];
+type FIXME = Exclude<OrderState, "buyingSupplies" | "producing">[];
 
 const orderStates = [
   "initial",

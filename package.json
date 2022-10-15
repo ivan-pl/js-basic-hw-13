@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ivan-pl/js-basic-hw-13#readme",
   "devDependencies": {
+    "prettier": "2.7.1",
     "typescript": "^4.8.4"
   }
 }

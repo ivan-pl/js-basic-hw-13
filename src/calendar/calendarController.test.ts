@@ -55,7 +55,26 @@ describe("CalendarStorage", () => {
     it("returns event", async () => {
       const id = await calendarController.addEvent(event);
       const returnedEvent = await calendarController.getEvent(id);
-      expect(returnedEvent).toEqual({...event, id: id});
+      expect(returnedEvent).toEqual({ ...event, id: id });
+    });
+  });
+
+  describe(".updateEvent", () => {
+    it("returns null", async () => {
+      expect(await calendarController.updateEvent(-1, event)).toBe(null);
+    });
+
+    it("updates event", async () => {
+      const id = await calendarController.addEvent(event);
+      const newEvent: EventRecord = {
+        ...event,
+        description: "New description",
+      };
+
+      expect(await calendarController.updateEvent(id, newEvent)).toEqual(
+        newEvent
+      );
+      expect(await calendarController.getEvent(id)).toEqual(newEvent);
     });
   });
 });

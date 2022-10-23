@@ -8,7 +8,7 @@ export interface ICalendarController {
   getEventList(dateFrom: Date, dateTo?: Date): Promise<EventRecord[] | null>;
   getEventList(tag: Tag): Promise<EventRecord[] | null>;
   getEventList(status: Status): Promise<EventRecord[] | null>;
-  updateEvent(id: number, newEvent: EventRecord): Promise<EventRecord>;
+  updateEvent(id: number, newEvent: EventRecord): Promise<EventRecord | null>;
   deleteEvent(id: number): Promise<EventRecord | null>;
 }
 
@@ -21,6 +21,13 @@ export class CalendarController implements ICalendarStorage {
 
   async getEvent(id: number): Promise<EventRecord | null> {
     return this.storage.getItem(id);
+  }
+
+  async updateEvent(
+    id: number,
+    newEvent: EventRecord
+  ): Promise<EventRecord | null> {
+    return this.storage.updateItem(id, newEvent);
   }
 }
 
@@ -44,6 +51,14 @@ class Storage<T extends EventRecord = EventRecord> {
           }
           return value;
         });
+  }
+
+  updateItem(id: number, item: T): T | null {
+    if (id.toString() in localStorage) {
+      localStorage.setItem(id.toString(), JSON.stringify(item));
+      return item;
+    }
+    return null;
   }
 }
 

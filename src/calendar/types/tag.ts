@@ -2,7 +2,7 @@ enum Tag {
   Work,
   Study,
   Leisure,
-  Other
-};
+  Other,
+}
 
 export default Tag;

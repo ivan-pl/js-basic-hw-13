@@ -16,7 +16,7 @@ export default class Storage<T extends EventRecord = EventRecord> {
     const item = localStorage.getItem(id.toString());
     return item === null
       ? null
-      : JSON.parse(item, (key: string, value: any) => {
+      : JSON.parse(item, (key: string, value: string) => {
           if (key === "date") {
             return new Date(value);
           }

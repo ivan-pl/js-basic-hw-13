@@ -18,10 +18,6 @@ describe("CalendarStorage", () => {
   });
 
   describe(".addEvent", () => {
-    it(".addEvents exists", () => {
-      expect(calendarController.addEvent).toBeInstanceOf(Function);
-    });
-
     it("returns Promise", () => {
       expect(calendarController.addEvent(event)).toBeInstanceOf(Promise);
     });

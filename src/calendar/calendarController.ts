@@ -5,7 +5,7 @@ import Status from "./types/status";
 export interface ICalendarController {
   addEvent(event: EventRecord): Promise<number>;
   getEvent(id: number): Promise<EventRecord | null>;
-  getEventList(dateFrom: Date, dateTo?: Date): Promise<EventRecord[] | null>;
+  getEventList(dateFrom: Date, dateTo: Date): Promise<EventRecord[] | null>;
   getEventList(tag: Tag): Promise<EventRecord[] | null>;
   getEventList(status: Status): Promise<EventRecord[] | null>;
   updateEvent(id: number, newEvent: EventRecord): Promise<EventRecord | null>;
@@ -25,6 +25,13 @@ export class CalendarController implements ICalendarStorage {
 
   async deleteEvent(id: number): Promise<number | null> {
     return this.storage.deleteItem(id);
+  }
+
+  async getEventList(
+    dateFrom: Date,
+    dateTo: Date
+  ): Promise<EventRecord[] | null> {
+    return this.storage.getItemsByDate(dateFrom, dateTo);
   }
 
   async updateEvent(
@@ -73,6 +80,20 @@ class Storage<T extends EventRecord = EventRecord> {
       return id;
     }
     return null;
+  }
+
+  getItemsByDate(dateFrom: Date, dateTo: Date): EventRecord[] | null {
+    const keys = Object.keys(localStorage);
+    const result: EventRecord[] | null = [];
+    for (const key of keys) {
+      const item = this.getItem(Number(key)) as EventRecord;
+      const date = item.date;
+      if (date >= dateFrom && date <= dateTo) {
+        result.push(item);
+      }
+    }
+
+    return result.length > 0 ? result : null;
   }
 }
 

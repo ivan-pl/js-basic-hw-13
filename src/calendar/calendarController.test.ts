@@ -89,7 +89,7 @@ describe("CalendarStorage", () => {
       );
 
       idArray.forEach(async (id) => {
-        const event = await calendarController.getEvent(id)
+        const event = await calendarController.getEvent(id);
         expect(event?.id).toBe(id);
         const deletedId = await calendarController.deleteEvent(id);
         expect(deletedId).toBe(id);
@@ -97,6 +97,52 @@ describe("CalendarStorage", () => {
           null
         );
       });
+    });
+  });
+
+  describe(".getEventList", () => {
+    const eventList: EventRecord[] = [
+      {
+        date: new Date("2022-10-01"),
+        tag: Tag.Work,
+        status: Status.Pending,
+        description: "Some event",
+      },
+      {
+        date: new Date("2022-10-02"),
+        tag: Tag.Work,
+        status: Status.Pending,
+        description: "Some event",
+      },
+      {
+        date: new Date("2022-10-03"),
+        tag: Tag.Leisure,
+        status: Status.InProcess,
+        description: "Some event",
+      },
+    ];
+
+    let idList: number[];
+
+    const fillIdList = async () => {
+      idList = await Promise.all(
+        eventList.map((e) => calendarController.addEvent(e))
+      );
+      return eventList.map((e, i) => ({ ...e, id: idList[i] }));
+    };
+
+    beforeEach(() => (idList = []));
+
+    it("gets list by date", async () => {
+      const newEventList = await fillIdList() as EventRecord[];
+      const events = (await calendarController.getEventList(
+        new Date("2022-10-02"),
+        new Date("2022-10-06")
+      )) as EventRecord[];
+
+      expect(events?.length).toBe(2);
+      expect(events[0]).toEqual(newEventList[1]);
+      expect(events[1]).toEqual(newEventList[2]);
     });
   });
 });

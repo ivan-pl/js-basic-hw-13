@@ -28,10 +28,17 @@ export class CalendarController implements ICalendarStorage {
   }
 
   async getEventList(
-    dateFrom: Date,
+    dateFromOrTag: Date | Tag,
     dateTo: Date
   ): Promise<EventRecord[] | null> {
-    return this.storage.getItemsByDate(dateFrom, dateTo);
+    if (dateFromOrTag instanceof Date) {
+      const dateFrom = dateFromOrTag;
+      return this.storage.getItemsByDate(dateFrom, dateTo);
+    } else if (dateFromOrTag in Tag) {
+      const tag = dateFromOrTag;
+      return this.storage.getItemsByTag(tag);
+    }
+    return null;
   }
 
   async updateEvent(
@@ -82,13 +89,27 @@ class Storage<T extends EventRecord = EventRecord> {
     return null;
   }
 
-  getItemsByDate(dateFrom: Date, dateTo: Date): EventRecord[] | null {
+  getItemsByDate(dateFrom: Date, dateTo: Date): T[] | null {
     const keys = Object.keys(localStorage);
-    const result: EventRecord[] | null = [];
+    const result: T[] | null = [];
     for (const key of keys) {
-      const item = this.getItem(Number(key)) as EventRecord;
+      const item = this.getItem(Number(key)) as T;
       const date = item.date;
       if (date >= dateFrom && date <= dateTo) {
+        result.push(item);
+      }
+    }
+
+    return result.length > 0 ? result : null;
+  }
+
+  getItemsByTag(tag: Tag): T[] | null {
+    const keys = Object.keys(localStorage);
+    const result: T[] | null = [];
+    for (const key of keys) {
+      const item = this.getItem(Number(key)) as T;
+      const curTag = item.tag;
+      if (curTag === tag) {
         result.push(item);
       }
     }

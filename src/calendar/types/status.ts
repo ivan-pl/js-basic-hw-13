@@ -1,7 +1,7 @@
 enum Status {
   InProcess,
   Pending,
-  Done
+  Done,
 }
 
 export default Status;

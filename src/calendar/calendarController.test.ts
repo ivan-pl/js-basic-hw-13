@@ -134,7 +134,7 @@ describe("CalendarStorage", () => {
     beforeEach(() => (idList = []));
 
     it("gets list by date", async () => {
-      const newEventList = await fillIdList() as EventRecord[];
+      const newEventList = (await fillIdList()) as EventRecord[];
       const events = (await calendarController.getEventList(
         new Date("2022-10-02"),
         new Date("2022-10-06")
@@ -143,6 +143,32 @@ describe("CalendarStorage", () => {
       expect(events?.length).toBe(2);
       expect(events[0]).toEqual(newEventList[1]);
       expect(events[1]).toEqual(newEventList[2]);
+
+      expect(
+        await calendarController.getEventList(
+          new Date("2010-10-02"),
+          new Date("2012-10-06")
+        )
+      ).toBe(null);
+    });
+
+    it("gets list by tag", async () => {
+      const newEventList = (await fillIdList()) as EventRecord[];
+      let events = (await calendarController.getEventList(
+        Tag.Work
+      )) as EventRecord[];
+
+      expect(events?.length).toBe(2);
+      expect(events[0]).toEqual(newEventList[0]);
+      expect(events[1]).toEqual(newEventList[1]);
+
+      events = (await calendarController.getEventList(
+        Tag.Leisure
+      )) as EventRecord[];
+      expect(events?.length).toBe(1);
+      expect(events[0]).toEqual(newEventList[2]);
+
+      expect(await calendarController.getEventList(Tag.Study)).toBe(null);
     });
   });
 });

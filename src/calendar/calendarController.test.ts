@@ -13,6 +13,7 @@ describe("CalendarStorage", () => {
   };
 
   beforeEach(() => {
+    globalThis.localStorage.clear();
     calendarController = new CalendarController();
   });
 
@@ -26,8 +27,8 @@ describe("CalendarStorage", () => {
     });
 
     it("add id to retuning Event", async () => {
-      const addedEvent = await calendarController.addEvent(event);
-      expect(typeof addedEvent.id).toBe("number");
+      const id = await calendarController.addEvent(event);
+      expect(typeof id).toBe("number");
     });
 
     it("adds different id's", async () => {
@@ -36,9 +37,7 @@ describe("CalendarStorage", () => {
         calendarController.addEvent(event)
       );
 
-      const idArray = await Promise.all(addedEvents).then((values) =>
-        values.map((_) => _.id)
-      );
+      const idArray = await Promise.all(addedEvents);
       const setOfId: Set<number> = new Set();
       idArray.forEach((_) => {
         if (_ !== undefined) {
@@ -47,6 +46,20 @@ describe("CalendarStorage", () => {
       });
 
       expect(setOfId.size).toBe(numberOfEvents);
+    });
+  });
+
+  describe(".getEvent", () => {
+    it("returns Promise with null", async () => {
+      const event = calendarController.getEvent(1);
+      expect(event).toBeInstanceOf(Promise);
+      expect(await event).toBe(null);
+    });
+
+    it("returns event", async () => {
+      const id = await calendarController.addEvent(event);
+      const returnedEvent = await calendarController.getEvent(id);
+      expect(returnedEvent).toEqual({...event, id: id});
     });
   });
 });

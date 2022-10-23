@@ -28,17 +28,18 @@ export class CalendarController implements ICalendarStorage {
   }
 
   async getEventList(
-    dateFromOrTag: Date | Tag,
+    dateFromOrTagOrStatus: Date | Tag | Status,
     dateTo: Date
   ): Promise<EventRecord[] | null> {
-    if (dateFromOrTag instanceof Date) {
-      const dateFrom = dateFromOrTag;
+    if (dateFromOrTagOrStatus instanceof Date) {
+      const dateFrom = dateFromOrTagOrStatus;
       return this.storage.getItemsByDate(dateFrom, dateTo);
-    } else if (dateFromOrTag in Tag) {
-      const tag = dateFromOrTag;
+    } else if (dateFromOrTagOrStatus in Tag) {
+      const tag = dateFromOrTagOrStatus as Tag;
       return this.storage.getItemsByTag(tag);
     }
-    return null;
+    const status = dateFromOrTagOrStatus as Status;
+    return this.storage.getItemsByStatus(status);
   }
 
   async updateEvent(
@@ -110,6 +111,20 @@ class Storage<T extends EventRecord = EventRecord> {
       const item = this.getItem(Number(key)) as T;
       const curTag = item.tag;
       if (curTag === tag) {
+        result.push(item);
+      }
+    }
+
+    return result.length > 0 ? result : null;
+  }
+
+  getItemsByStatus(status: Status): T[] | null {
+    const keys = Object.keys(localStorage);
+    const result: T[] | null = [];
+    for (const key of keys) {
+      const item = this.getItem(Number(key)) as T;
+      const curStatus = item.status;
+      if (curStatus === status) {
         result.push(item);
       }
     }

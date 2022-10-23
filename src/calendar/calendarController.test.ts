@@ -170,5 +170,24 @@ describe("CalendarStorage", () => {
 
       expect(await calendarController.getEventList(Tag.Study)).toBe(null);
     });
+
+    it("gets list by status", async () => {
+      const newEventList = (await fillIdList()) as EventRecord[];
+      let events = (await calendarController.getEventList(
+        Status.Pending
+      )) as EventRecord[];
+
+      expect(events?.length).toBe(2);
+      expect(events[0]).toEqual(newEventList[0]);
+      expect(events[1]).toEqual(newEventList[1]);
+
+      events = (await calendarController.getEventList(
+        Status.InProcess
+      )) as EventRecord[];
+      expect(events?.length).toBe(1);
+      expect(events[0]).toEqual(newEventList[2]);
+
+      expect(await calendarController.getEventList(Status.Done)).toBe(null);
+    });
   });
 });

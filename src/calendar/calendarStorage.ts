@@ -2,7 +2,7 @@ import EventRecord from "./types/eventrecord";
 import Tag from "./types/tag";
 import Status from "./types/status"
 
-interface ICalendarController {
+interface ICalendarStorage {
   addEvent(event: EventRecord): Promise<EventRecord>,
   getEventList(id: number): Promise<EventRecord[]>,
   getEventList(dateFrom: Date, dateTo?: Date): Promise<EventRecord[]>,

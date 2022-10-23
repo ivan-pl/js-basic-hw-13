@@ -1,10 +1,10 @@
-import { ICalendarStorage, CalendarStorage } from "./calendarStorage";
+import { ICalendarController, CalendarController } from "./calendarController";
 import EventRecord from "./types/eventrecord";
 import Status from "./types/status";
 import Tag from "./types/tag";
 
 describe("CalendarStorage", () => {
-  let calendarStorage: ICalendarStorage;
+  let calendarController: ICalendarController;
   const event: EventRecord = {
     date: new Date(),
     tag: Tag.Work,
@@ -13,27 +13,27 @@ describe("CalendarStorage", () => {
   };
 
   beforeEach(() => {
-    calendarStorage = new CalendarStorage();
+    calendarController = new CalendarController();
   });
 
   describe(".addEvent", () => {
     it(".addEvents exists", () => {
-      expect(calendarStorage.addEvent).toBeInstanceOf(Function);
+      expect(calendarController.addEvent).toBeInstanceOf(Function);
     });
 
     it("returns Promise", () => {
-      expect(calendarStorage.addEvent(event)).toBeInstanceOf(Promise);
+      expect(calendarController.addEvent(event)).toBeInstanceOf(Promise);
     });
 
     it("add id to retuning Event", async () => {
-      const addedEvent = await calendarStorage.addEvent(event);
+      const addedEvent = await calendarController.addEvent(event);
       expect(typeof addedEvent.id).toBe("number");
     });
 
     it("adds different id's", async () => {
       const numberOfEvents = 5;
       const addedEvents = Array.from({ length: numberOfEvents }, () =>
-        calendarStorage.addEvent(event)
+        calendarController.addEvent(event)
       );
 
       const idArray = await Promise.all(addedEvents).then((values) =>

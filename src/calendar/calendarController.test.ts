@@ -77,4 +77,26 @@ describe("CalendarStorage", () => {
       expect(await calendarController.getEvent(id)).toEqual(newEvent);
     });
   });
+
+  describe(".deleteEvent", () => {
+    it("returns null", async () => {
+      expect(await calendarController.deleteEvent(-1)).toBe(null);
+    });
+
+    it("deletes event", async () => {
+      const idArray = await Promise.all(
+        Array.from({ length: 5 }, () => calendarController.addEvent(event))
+      );
+
+      idArray.forEach(async (id) => {
+        const event = await calendarController.getEvent(id)
+        expect(event?.id).toBe(id);
+        const deletedId = await calendarController.deleteEvent(id);
+        expect(deletedId).toBe(id);
+        expect(await calendarController.getEvent(deletedId as number)).toBe(
+          null
+        );
+      });
+    });
+  });
 });

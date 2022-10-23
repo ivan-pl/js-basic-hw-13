@@ -9,7 +9,7 @@ export interface ICalendarController {
   getEventList(tag: Tag): Promise<EventRecord[] | null>;
   getEventList(status: Status): Promise<EventRecord[] | null>;
   updateEvent(id: number, newEvent: EventRecord): Promise<EventRecord | null>;
-  deleteEvent(id: number): Promise<EventRecord | null>;
+  deleteEvent(id: number): Promise<number | null>;
 }
 
 export class CalendarController implements ICalendarStorage {
@@ -21,6 +21,10 @@ export class CalendarController implements ICalendarStorage {
 
   async getEvent(id: number): Promise<EventRecord | null> {
     return this.storage.getItem(id);
+  }
+
+  async deleteEvent(id: number): Promise<number | null> {
+    return this.storage.deleteItem(id);
   }
 
   async updateEvent(
@@ -54,9 +58,19 @@ class Storage<T extends EventRecord = EventRecord> {
   }
 
   updateItem(id: number, item: T): T | null {
-    if (id.toString() in localStorage) {
-      localStorage.setItem(id.toString(), JSON.stringify(item));
+    const idStr = id.toString();
+    if (idStr in localStorage) {
+      localStorage.setItem(idStr, JSON.stringify(item));
       return item;
+    }
+    return null;
+  }
+
+  deleteItem(id: number): number | null {
+    const idStr = id.toString();
+    if (idStr in localStorage) {
+      localStorage.removeItem(idStr);
+      return id;
     }
     return null;
   }

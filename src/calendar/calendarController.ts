@@ -52,8 +52,10 @@ export class CalendarController implements ICalendarController {
       }
     } else if (propVal in ETag) {
       return this.storage.filterItems("tag", propVal as ETag);
+    } else if (propVal in EStatus) {
+      return this.storage.filterItems("status", propVal as EStatus);
     }
-    return this.storage.filterItems("status", propVal as EStatus);
+    return this.storage.filterItems("description", propVal as string);
   }
 
   async updateEvent(

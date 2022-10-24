@@ -111,19 +111,19 @@ describe("CalendarController", () => {
         date: new Date("2022-10-01"),
         tag: ETag.WORK,
         status: EStatus.PENDING,
-        description: "Some event",
+        description: "Event 1",
       },
       {
         date: new Date("2022-10-02"),
         tag: ETag.WORK,
         status: EStatus.PENDING,
-        description: "Some event",
+        description: "Event 2",
       },
       {
         date: new Date("2022-10-03"),
         tag: ETag.LEISURE,
         status: EStatus.INPROCESS,
-        description: "Some event",
+        description: "Event 3",
       },
     ];
 
@@ -193,6 +193,21 @@ describe("CalendarController", () => {
       expect(events[0]).toEqual(newEventList[2]);
 
       expect(await calendarController.getEventList(EStatus.DONE)).toBe(null);
+    });
+
+    it("gets list by description", async () => {
+      const newEventList = (await fillIdList()) as EventRecord[];
+      let events = (await calendarController.getEventList(
+        "Event"
+      )) as EventRecord[];
+
+      expect(events).toEqual(newEventList);
+
+      events = (await calendarController.getEventList("1")) as EventRecord[];
+      expect(events?.length).toBe(1);
+      expect(events[0]).toEqual(newEventList[0]);
+
+      expect(await calendarController.getEventList("No such event")).toBe(null);
     });
   });
 });

@@ -48,6 +48,9 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     let isEqual: (propVal: U) => boolean;
     if (propName === "date") {
       isEqual = (propVal) => propVal >= val && propVal <= (dateTo as Date);
+    } else if (propName === "description") {
+      const regexp = new RegExp(val as string, "i");
+      isEqual = (propVal) => regexp.test(propVal as string);
     } else {
       isEqual = (propVal) => propVal === val;
     }

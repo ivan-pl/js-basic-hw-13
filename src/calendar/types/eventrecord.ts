@@ -1,12 +1,12 @@
-import Status from "./status";
-import Tag from "./tag";
+import EStatus from "./status";
+import ETag from "./tag";
 
-type EventRecord = {
+interface IEventRecord {
   id?: number;
   date: Date;
-  tag: Tag;
-  status: Status;
+  tag: ETag;
+  status: EStatus;
   description: string;
 };
 
-export default EventRecord;
+export default IEventRecord;

@@ -1,14 +1,14 @@
 import { ICalendarController, CalendarController } from "./calendarController";
 import EventRecord from "./types/eventrecord";
-import Status from "./types/status";
-import Tag from "./types/tag";
+import EStatus from "./types/status";
+import ETag from "./types/tag";
 
 describe("CalendarStorage", () => {
   let calendarController: ICalendarController;
   const event: EventRecord = {
     date: new Date(),
-    tag: Tag.Work,
-    status: Status.Pending,
+    tag: ETag.WORK,
+    status: EStatus.PENDING,
     description: "Some event",
   };
 
@@ -104,20 +104,20 @@ describe("CalendarStorage", () => {
     const eventList: EventRecord[] = [
       {
         date: new Date("2022-10-01"),
-        tag: Tag.Work,
-        status: Status.Pending,
+        tag: ETag.WORK,
+        status: EStatus.PENDING,
         description: "Some event",
       },
       {
         date: new Date("2022-10-02"),
-        tag: Tag.Work,
-        status: Status.Pending,
+        tag: ETag.WORK,
+        status: EStatus.PENDING,
         description: "Some event",
       },
       {
         date: new Date("2022-10-03"),
-        tag: Tag.Leisure,
-        status: Status.InProcess,
+        tag: ETag.LEISURE,
+        status: EStatus.INPROCESS,
         description: "Some event",
       },
     ];
@@ -155,7 +155,7 @@ describe("CalendarStorage", () => {
     it("gets list by tag", async () => {
       const newEventList = (await fillIdList()) as EventRecord[];
       let events = (await calendarController.getEventList(
-        Tag.Work
+        ETag.WORK
       )) as EventRecord[];
 
       expect(events?.length).toBe(2);
@@ -163,18 +163,18 @@ describe("CalendarStorage", () => {
       expect(events[1]).toEqual(newEventList[1]);
 
       events = (await calendarController.getEventList(
-        Tag.Leisure
+        ETag.LEISURE
       )) as EventRecord[];
       expect(events?.length).toBe(1);
       expect(events[0]).toEqual(newEventList[2]);
 
-      expect(await calendarController.getEventList(Tag.Study)).toBe(null);
+      expect(await calendarController.getEventList(ETag.STUDY)).toBe(null);
     });
 
     it("gets list by status", async () => {
       const newEventList = (await fillIdList()) as EventRecord[];
       let events = (await calendarController.getEventList(
-        Status.Pending
+        EStatus.PENDING
       )) as EventRecord[];
 
       expect(events?.length).toBe(2);
@@ -182,12 +182,12 @@ describe("CalendarStorage", () => {
       expect(events[1]).toEqual(newEventList[1]);
 
       events = (await calendarController.getEventList(
-        Status.InProcess
+        EStatus.INPROCESS
       )) as EventRecord[];
       expect(events?.length).toBe(1);
       expect(events[0]).toEqual(newEventList[2]);
 
-      expect(await calendarController.getEventList(Status.Done)).toBe(null);
+      expect(await calendarController.getEventList(EStatus.DONE)).toBe(null);
     });
   });
 });

@@ -1,30 +1,30 @@
-import EventRecord from "./types/eventrecord";
-import Tag from "./types/tag";
-import Status from "./types/status";
+import IEventRecord from "./types/eventrecord";
+import ETag from "./types/tag";
+import EStatus from "./types/status";
 import Storage from "./storage";
 
 export interface ICalendarController {
-  addEvent(event: EventRecord): Promise<number>;
-  getEvent(id: number): Promise<EventRecord | null>;
-  getEventList(dateFrom: Date, dateTo: Date): Promise<EventRecord[] | null>;
-  getEventList(tag: Tag): Promise<EventRecord[] | null>;
-  getEventList(status: Status): Promise<EventRecord[] | null>;
+  addEvent(event: IEventRecord): Promise<number>;
+  getEvent(id: number): Promise<IEventRecord | null>;
+  getEventList(dateFrom: Date, dateTo: Date): Promise<IEventRecord[] | null>;
+  getEventList(ETag: ETag): Promise<IEventRecord[] | null>;
+  getEventList(EStatus: EStatus): Promise<IEventRecord[] | null>;
   getEventList(
-    dateFromOrTagOrStatus: Date | Tag | Status,
+    dateFromOrETagOrEStatus: Date | ETag | EStatus,
     dateTo?: Date
-  ): Promise<EventRecord[] | null>;
-  updateEvent(id: number, newEvent: EventRecord): Promise<EventRecord | null>;
+  ): Promise<IEventRecord[] | null>;
+  updateEvent(id: number, newEvent: IEventRecord): Promise<IEventRecord | null>;
   deleteEvent(id: number): Promise<number | null>;
 }
 
 export class CalendarController implements ICalendarController {
   private storage = new Storage();
 
-  async addEvent(event: EventRecord): Promise<number> {
+  async addEvent(event: IEventRecord): Promise<number> {
     return this.storage.add(event);
   }
 
-  async getEvent(id: number): Promise<EventRecord | null> {
+  async getEvent(id: number): Promise<IEventRecord | null> {
     return this.storage.getItem(id);
   }
 
@@ -33,26 +33,26 @@ export class CalendarController implements ICalendarController {
   }
 
   async getEventList(
-    dateFromOrTagOrStatus: Date | Tag | Status,
+    dateFromOrETagOrEStatus: Date | ETag | EStatus,
     dateTo?: Date
-  ): Promise<EventRecord[] | null> {
-    if (dateFromOrTagOrStatus instanceof Date) {
-      const dateFrom = dateFromOrTagOrStatus;
+  ): Promise<IEventRecord[] | null> {
+    if (dateFromOrETagOrEStatus instanceof Date) {
+      const dateFrom = dateFromOrETagOrEStatus;
       if (dateTo instanceof Date) {
         return this.storage.getItemsByDate(dateFrom, dateTo);
       }
-    } else if (dateFromOrTagOrStatus in Tag) {
-      const tag = dateFromOrTagOrStatus as Tag;
-      return this.storage.getItemsByTag(tag);
+    } else if (dateFromOrETagOrEStatus in ETag) {
+      const ETag = dateFromOrETagOrEStatus as ETag;
+      return this.storage.getItemsByTag(ETag);
     }
-    const status = dateFromOrTagOrStatus as Status;
-    return this.storage.getItemsByStatus(status);
+    const EStatus = dateFromOrETagOrEStatus as EStatus;
+    return this.storage.getItemsByStatus(EStatus);
   }
 
   async updateEvent(
     id: number,
-    newEvent: EventRecord
-  ): Promise<EventRecord | null> {
+    newEvent: IEventRecord
+  ): Promise<IEventRecord | null> {
     return this.storage.updateItem(id, newEvent);
   }
 }

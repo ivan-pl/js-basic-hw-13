@@ -1,8 +1,8 @@
-import EventRecord from "./types/eventrecord";
-import Tag from "./types/tag";
-import Status from "./types/status";
+import IEventRecord from "./types/eventrecord";
+import ETag from "./types/tag";
+import EStatus from "./types/status";
 
-export default class Storage<T extends EventRecord = EventRecord> {
+export default class Storage<T extends IEventRecord = IEventRecord> {
   private idGenerator = numberGenerator();
 
   add(item: T): number {
@@ -56,13 +56,13 @@ export default class Storage<T extends EventRecord = EventRecord> {
     return result.length > 0 ? result : null;
   }
 
-  getItemsByTag(tag: Tag): T[] | null {
+  getItemsByTag(ETag: ETag): T[] | null {
     const keys = Object.keys(localStorage);
     const result: T[] | null = [];
     for (const key of keys) {
       const item = this.getItem(Number(key)) as T;
-      const curTag = item.tag;
-      if (curTag === tag) {
+      const curETag = item.tag;
+      if (curETag === ETag) {
         result.push(item);
       }
     }
@@ -70,13 +70,13 @@ export default class Storage<T extends EventRecord = EventRecord> {
     return result.length > 0 ? result : null;
   }
 
-  getItemsByStatus(status: Status): T[] | null {
+  getItemsByStatus(EStatus: EStatus): T[] | null {
     const keys = Object.keys(localStorage);
     const result: T[] | null = [];
     for (const key of keys) {
       const item = this.getItem(Number(key)) as T;
-      const curStatus = item.status;
-      if (curStatus === status) {
+      const curEStatus = item.status;
+      if (curEStatus === EStatus) {
         result.push(item);
       }
     }

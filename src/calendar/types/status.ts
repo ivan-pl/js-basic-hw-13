@@ -1,7 +1,7 @@
-enum Status {
-  InProcess = "InProcess",
-  Pending = "Pending",
-  Done = "Done",
+enum EStatus {
+  INPROCESS = "INPROCESS",
+  PENDING = "PENDING",
+  DONE = "DONE",
 }
 
-export default Status;
+export default EStatus;

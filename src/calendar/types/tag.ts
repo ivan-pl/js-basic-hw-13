@@ -1,8 +1,8 @@
-enum Tag {
-  Work,
-  Study,
-  Leisure,
-  Other,
+enum ETag {
+  WORK = "WORK",
+  STUDY = "STUDY",
+  LEISURE = "LEISURE",
+  OTHER= "OTHER",
 }
 
-export default Tag;
+export default ETag;

@@ -2,7 +2,7 @@ enum ETag {
   WORK = "WORK",
   STUDY = "STUDY",
   LEISURE = "LEISURE",
-  OTHER= "OTHER",
+  OTHER = "OTHER",
 }
 
 export default ETag;

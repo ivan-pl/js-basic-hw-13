@@ -7,10 +7,11 @@ export interface ICalendarController {
   addEvent(event: IEventRecord): Promise<number>;
   getEvent(id: number): Promise<IEventRecord | null>;
   getEventList(dateFrom: Date, dateTo: Date): Promise<IEventRecord[] | null>;
-  getEventList(ETag: ETag): Promise<IEventRecord[] | null>;
-  getEventList(EStatus: EStatus): Promise<IEventRecord[] | null>;
+  getEventList(tag: ETag): Promise<IEventRecord[] | null>;
+  getEventList(status: EStatus): Promise<IEventRecord[] | null>;
+  getEventList(desc: string): Promise<IEventRecord[] | null>;
   getEventList(
-    dateFromOrETagOrEStatus: Date | ETag | EStatus,
+    propVal: IEventRecord["tag" | "status" | "description" | "date"],
     dateTo?: Date
   ): Promise<IEventRecord[] | null>;
   updateEvent(id: number, newEvent: IEventRecord): Promise<IEventRecord | null>;
@@ -41,20 +42,18 @@ export class CalendarController implements ICalendarController {
   }
 
   async getEventList(
-    dateFromOrETagOrEStatus: Date | ETag | EStatus,
+    propVal: IEventRecord["tag" | "status" | "description" | "date"],
     dateTo?: Date
   ): Promise<IEventRecord[] | null> {
-    if (dateFromOrETagOrEStatus instanceof Date) {
-      const dateFrom = dateFromOrETagOrEStatus;
+    if (propVal instanceof Date) {
+      const dateFrom = propVal;
       if (dateTo instanceof Date) {
-        return this.storage.getItemsByDate(dateFrom, dateTo);
+        return this.storage.filterItems("date", dateFrom, dateTo);
       }
-    } else if (dateFromOrETagOrEStatus in ETag) {
-      const ETag = dateFromOrETagOrEStatus as ETag;
-      return this.storage.getItemsByTag(ETag);
+    } else if (propVal in ETag) {
+      return this.storage.filterItems("tag", propVal as ETag);
     }
-    const EStatus = dateFromOrETagOrEStatus as EStatus;
-    return this.storage.getItemsByStatus(EStatus);
+    return this.storage.filterItems("status", propVal as EStatus);
   }
 
   async updateEvent(

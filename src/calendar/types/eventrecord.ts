@@ -7,6 +7,6 @@ interface IEventRecord {
   tag: ETag;
   status: EStatus;
   description: string;
-};
+}
 
 export default IEventRecord;

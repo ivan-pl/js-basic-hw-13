@@ -1,6 +1,4 @@
 import IEventRecord from "./types/eventrecord";
-import ETag from "./types/tag";
-import EStatus from "./types/status";
 
 export default class Storage<T extends IEventRecord = IEventRecord> {
   private idGenerator = numberGenerator();
@@ -42,41 +40,23 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     return null;
   }
 
-  getItemsByDate(dateFrom: Date, dateTo: Date): T[] | null {
-    const keys = Object.keys(localStorage);
-    const result: T[] | null = [];
-    for (const key of keys) {
-      const item = this.getItem(Number(key)) as T;
-      const date = item.date;
-      if (date >= dateFrom && date <= dateTo) {
-        result.push(item);
-      }
+  filterItems<F extends Exclude<keyof T, "id">, U extends T[F]>(
+    propName: F,
+    val: U,
+    dateTo?: F extends "date" ? U : never
+  ): T[] | null {
+    let isEqual: (propVal: U) => boolean;
+    if (propName === "date") {
+      isEqual = (propVal) => propVal >= val && propVal <= (dateTo as Date);
+    } else {
+      isEqual = (propVal) => propVal === val;
     }
 
-    return result.length > 0 ? result : null;
-  }
-
-  getItemsByTag(ETag: ETag): T[] | null {
     const keys = Object.keys(localStorage);
     const result: T[] | null = [];
     for (const key of keys) {
       const item = this.getItem(Number(key)) as T;
-      const curETag = item.tag;
-      if (curETag === ETag) {
-        result.push(item);
-      }
-    }
-
-    return result.length > 0 ? result : null;
-  }
-
-  getItemsByStatus(EStatus: EStatus): T[] | null {
-    const keys = Object.keys(localStorage);
-    const result: T[] | null = [];
-    for (const key of keys) {
-      const item = this.getItem(Number(key)) as T;
-      const curEStatus = item.status;
-      if (curEStatus === EStatus) {
+      if (isEqual(item[propName] as U)) {
         result.push(item);
       }
     }

@@ -19,6 +19,14 @@ export interface ICalendarController {
 
 export class CalendarController implements ICalendarController {
   private storage = new Storage();
+  private static instance: CalendarController | null = null;
+
+  constructor() {
+    if (CalendarController.instance === null) {
+      CalendarController.instance = this;
+    }
+    return CalendarController.instance;
+  }
 
   async addEvent(event: IEventRecord): Promise<number> {
     return this.storage.add(event);

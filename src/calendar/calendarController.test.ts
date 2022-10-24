@@ -3,7 +3,7 @@ import EventRecord from "./types/eventrecord";
 import EStatus from "./types/status";
 import ETag from "./types/tag";
 
-describe("CalendarStorage", () => {
+describe("CalendarController", () => {
   let calendarController: ICalendarController;
   const event: EventRecord = {
     date: new Date(),
@@ -15,6 +15,11 @@ describe("CalendarStorage", () => {
   beforeEach(() => {
     globalThis.localStorage.clear();
     calendarController = new CalendarController();
+  });
+
+  it("CalendarController is singleton", () => {
+    const calendarController2 = new CalendarController();
+    expect(calendarController2).toBe(calendarController);
   });
 
   describe(".addEvent", () => {

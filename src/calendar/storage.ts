@@ -40,12 +40,12 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     return null;
   }
 
-  filterItems<F extends Exclude<keyof T, "id">, U extends T[F]>(
+  filterItems<F extends Exclude<keyof T, "id">>(
     propName: F,
-    val: U,
-    dateTo?: F extends "date" ? U : never
+    val: T[F],
+    dateTo?: F extends "date" ? T[F] : never
   ): T[] | null {
-    let isEqual: (propVal: U) => boolean;
+    let isEqual: (propVal: T[F]) => boolean;
     if (propName === "date") {
       isEqual = (propVal) => propVal >= val && propVal <= (dateTo as Date);
     } else if (propName === "description") {
@@ -59,7 +59,7 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     const result: T[] | null = [];
     for (const key of keys) {
       const item = this.getItem(Number(key)) as T;
-      if (isEqual(item[propName] as U)) {
+      if (isEqual(item[propName])) {
         result.push(item);
       }
     }

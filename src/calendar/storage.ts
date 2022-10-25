@@ -2,17 +2,27 @@ import IEventRecord from "./types/eventrecord";
 import IDateRange from "./types/daterange";
 
 export default class Storage<T extends IEventRecord = IEventRecord> {
-  private idGenerator = numberGenerator();
+  private keyGen: Generator<{ id: number; key: string }>;
+  private storageName: string;
+
+  constructor(controllerId: number) {
+    this.storageName = `storage${controllerId}`;
+    this.keyGen = keyGenerator(this.storageName + "_");
+  }
 
   add(item: T): number {
-    const nextId = this.idGenerator.next().value;
-    const newItem = { ...item, id: nextId };
-    localStorage.setItem(nextId, JSON.stringify(newItem));
-    return nextId;
+    const { id, key } = this.keyGen.next().value;
+    const newItem = { ...item, id: id };
+    localStorage.setItem(key, JSON.stringify(newItem));
+    return id;
+  }
+
+  keyById(id: number): string {
+    return this.storageName + "_" + id;
   }
 
   getItem(id: number): T | null {
-    const item = localStorage.getItem(id.toString());
+    const item = localStorage.getItem(this.keyById(id));
     return item === null
       ? null
       : JSON.parse(item, (key: string, value: string) => {
@@ -24,18 +34,18 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
   }
 
   updateItem(id: number, item: T): T | null {
-    const idStr = id.toString();
-    if (idStr in localStorage) {
-      localStorage.setItem(idStr, JSON.stringify(item));
+    const key = this.keyById(id);
+    if (key in localStorage) {
+      localStorage.setItem(key, JSON.stringify(item));
       return item;
     }
     return null;
   }
 
   deleteItem(id: number): number | null {
-    const idStr = id.toString();
-    if (idStr in localStorage) {
-      localStorage.removeItem(idStr);
+    const key = this.keyById(id);
+    if (key in localStorage) {
+      localStorage.removeItem(key);
       return id;
     }
     return null;
@@ -63,7 +73,9 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
         break;
     }
 
-    const keys = Object.keys(localStorage);
+    const keys = Object.keys(localStorage).filter((k) =>
+      k.startsWith(this.storageName)
+    );
     const result: T[] | null = [];
     for (const key of keys) {
       const item = this.getItem(Number(key)) as T;
@@ -76,8 +88,8 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
   }
 }
 
-function* numberGenerator(): Generator<number> {
+function* keyGenerator(prefix: string): Generator<{ id: number; key: string }> {
   for (let i = 1; ; i++) {
-    yield i;
+    yield { id: i, key: prefix + i };
   }
 }

@@ -17,9 +17,23 @@ describe("CalendarController", () => {
     calendarController = new CalendarController();
   });
 
-  it("CalendarController is singleton", () => {
+  it("CalendarController could have several instances", async () => {
     const calendarController2 = new CalendarController();
-    expect(calendarController2).toBe(calendarController);
+    expect(calendarController).not.toBe(calendarController2);
+
+    const event2: IEventRecord = {
+      date: new Date(),
+      tag: ETag.LEISURE,
+      status: EStatus.DONE,
+      description: "Another event",
+    };
+    const idCal1 = await calendarController.addEvent(event);
+    const idCal2 = await calendarController2.addEvent(event2);
+    expect(idCal1).toBe(idCal2);
+
+    expect(await calendarController.getEvent(idCal1)).not.toEqual(
+      await calendarController2.getEvent(idCal2)
+    );
   });
 
   describe(".addEvent", () => {

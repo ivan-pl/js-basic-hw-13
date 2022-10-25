@@ -14,14 +14,13 @@ export interface ICalendarController {
 }
 
 export class CalendarController implements ICalendarController {
-  private storage = new Storage();
-  private static instance: CalendarController | null = null;
+  private storage;
+  private static instanceIdGenerator = numberGenerator();
+  private instanceId: number;
 
   constructor() {
-    if (CalendarController.instance === null) {
-      CalendarController.instance = this;
-    }
-    return CalendarController.instance;
+    this.instanceId = CalendarController.instanceIdGenerator.next().value;
+    this.storage = new Storage(this.instanceId);
   }
 
   async addEvent(event: IEventRecord): Promise<number> {
@@ -48,5 +47,11 @@ export class CalendarController implements ICalendarController {
     newEvent: IEventRecord
   ): Promise<IEventRecord | null> {
     return this.storage.updateItem(id, newEvent);
+  }
+}
+
+function* numberGenerator(): Generator<number> {
+  for (let i = 1; ; i++) {
+    yield i;
   }
 }

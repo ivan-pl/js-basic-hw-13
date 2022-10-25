@@ -1,11 +1,11 @@
 import { ICalendarController, CalendarController } from "./calendarController";
-import EventRecord from "./types/eventrecord";
+import IEventRecord from "./types/eventrecord";
 import EStatus from "./types/status";
 import ETag from "./types/tag";
 
 describe("CalendarController", () => {
   let calendarController: ICalendarController;
-  const event: EventRecord = {
+  const event: IEventRecord = {
     date: new Date(),
     tag: ETag.WORK,
     status: EStatus.PENDING,
@@ -71,7 +71,7 @@ describe("CalendarController", () => {
 
     it("updates event", async () => {
       const id = await calendarController.addEvent(event);
-      const newEvent: EventRecord = {
+      const newEvent: IEventRecord = {
         ...event,
         description: "New description",
       };
@@ -106,7 +106,7 @@ describe("CalendarController", () => {
   });
 
   describe(".getEventList", () => {
-    const eventList: EventRecord[] = [
+    const eventList: IEventRecord[] = [
       {
         date: new Date("2022-10-01"),
         tag: ETag.WORK,
@@ -139,75 +139,89 @@ describe("CalendarController", () => {
     beforeEach(() => (idList = []));
 
     it("gets list by date", async () => {
-      const newEventList = (await fillIdList()) as EventRecord[];
-      const events = (await calendarController.getEventList(
-        new Date("2022-10-02"),
-        new Date("2022-10-06")
-      )) as EventRecord[];
+      const newEventList = (await fillIdList()) as IEventRecord[];
+      const events = (await calendarController.getEventList("date", {
+        dateFrom: new Date("2022-10-02"),
+        dateTo: new Date("2022-10-06"),
+      })) as IEventRecord[];
 
       expect(events?.length).toBe(2);
       expect(events[0]).toEqual(newEventList[1]);
       expect(events[1]).toEqual(newEventList[2]);
 
       expect(
-        await calendarController.getEventList(
-          new Date("2010-10-02"),
-          new Date("2012-10-06")
-        )
+        await calendarController.getEventList("date", {
+          dateFrom: new Date("2010-10-02"),
+          dateTo: new Date("2012-10-06"),
+        })
       ).toBe(null);
     });
 
     it("gets list by tag", async () => {
-      const newEventList = (await fillIdList()) as EventRecord[];
+      const newEventList = (await fillIdList()) as IEventRecord[];
       let events = (await calendarController.getEventList(
+        "tag",
         ETag.WORK
-      )) as EventRecord[];
+      )) as IEventRecord[];
 
       expect(events?.length).toBe(2);
       expect(events[0]).toEqual(newEventList[0]);
       expect(events[1]).toEqual(newEventList[1]);
 
       events = (await calendarController.getEventList(
+        "tag",
         ETag.LEISURE
-      )) as EventRecord[];
+      )) as IEventRecord[];
       expect(events?.length).toBe(1);
       expect(events[0]).toEqual(newEventList[2]);
 
-      expect(await calendarController.getEventList(ETag.STUDY)).toBe(null);
+      expect(await calendarController.getEventList("tag", ETag.STUDY)).toBe(
+        null
+      );
     });
 
     it("gets list by status", async () => {
-      const newEventList = (await fillIdList()) as EventRecord[];
+      const newEventList = (await fillIdList()) as IEventRecord[];
       let events = (await calendarController.getEventList(
+        "status",
         EStatus.PENDING
-      )) as EventRecord[];
+      )) as IEventRecord[];
 
       expect(events?.length).toBe(2);
       expect(events[0]).toEqual(newEventList[0]);
       expect(events[1]).toEqual(newEventList[1]);
 
       events = (await calendarController.getEventList(
+        "status",
         EStatus.INPROCESS
-      )) as EventRecord[];
+      )) as IEventRecord[];
       expect(events?.length).toBe(1);
       expect(events[0]).toEqual(newEventList[2]);
 
-      expect(await calendarController.getEventList(EStatus.DONE)).toBe(null);
+      expect(
+        await calendarController.getEventList("status", EStatus.DONE)
+      ).toBe(null);
     });
 
     it("gets list by description", async () => {
-      const newEventList = (await fillIdList()) as EventRecord[];
+      const newEventList = (await fillIdList()) as IEventRecord[];
       let events = (await calendarController.getEventList(
+        "description",
         "Event"
-      )) as EventRecord[];
+      )) as IEventRecord[];
 
       expect(events).toEqual(newEventList);
 
-      events = (await calendarController.getEventList("1")) as EventRecord[];
+      events = (await calendarController.getEventList(
+        "description",
+        "1"
+      )) as IEventRecord[];
       expect(events?.length).toBe(1);
       expect(events[0]).toEqual(newEventList[0]);
 
-      expect(await calendarController.getEventList("No such event")).toBe(null);
+      expect(
+        await calendarController.getEventList("description", "No such event")
+      ).toBe(null);
     });
   });
 });

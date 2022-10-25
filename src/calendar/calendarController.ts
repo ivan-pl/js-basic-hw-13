@@ -1,18 +1,13 @@
 import IEventRecord from "./types/eventrecord";
-import ETag from "./types/tag";
-import EStatus from "./types/status";
+import IDateRange from "./types/daterange";
 import Storage from "./storage";
 
 export interface ICalendarController {
   addEvent(event: IEventRecord): Promise<number>;
   getEvent(id: number): Promise<IEventRecord | null>;
-  getEventList(dateFrom: Date, dateTo: Date): Promise<IEventRecord[] | null>;
-  getEventList(tag: ETag): Promise<IEventRecord[] | null>;
-  getEventList(status: EStatus): Promise<IEventRecord[] | null>;
-  getEventList(desc: string): Promise<IEventRecord[] | null>;
-  getEventList(
-    propVal: IEventRecord["tag" | "status" | "description" | "date"],
-    dateTo?: Date
+  getEventList<T extends Exclude<keyof IEventRecord, "id">>(
+    propName: T,
+    propVal: T extends "date" ? IDateRange : IEventRecord[T]
   ): Promise<IEventRecord[] | null>;
   updateEvent(id: number, newEvent: IEventRecord): Promise<IEventRecord | null>;
   deleteEvent(id: number): Promise<number | null>;
@@ -41,21 +36,11 @@ export class CalendarController implements ICalendarController {
     return this.storage.deleteItem(id);
   }
 
-  async getEventList(
-    propVal: IEventRecord["tag" | "status" | "description" | "date"],
-    dateTo?: Date
+  async getEventList<T extends Exclude<keyof IEventRecord, "id">>(
+    propName: T,
+    propVal: T extends "date" ? IDateRange : IEventRecord[T]
   ): Promise<IEventRecord[] | null> {
-    if (propVal instanceof Date) {
-      const dateFrom = propVal;
-      if (dateTo instanceof Date) {
-        return this.storage.filterItems("date", dateFrom, dateTo);
-      }
-    } else if (propVal in ETag) {
-      return this.storage.filterItems("tag", propVal as ETag);
-    } else if (propVal in EStatus) {
-      return this.storage.filterItems("status", propVal as EStatus);
-    }
-    return this.storage.filterItems("description", propVal as string);
+    return this.storage.filterItems(propName, propVal);
   }
 
   async updateEvent(

@@ -1,4 +1,5 @@
 import IEventRecord from "./types/eventrecord";
+import IDateRange from "./types/daterange";
 
 export default class Storage<T extends IEventRecord = IEventRecord> {
   private idGenerator = numberGenerator();
@@ -42,17 +43,24 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
 
   filterItems<F extends Exclude<keyof T, "id">>(
     propName: F,
-    val: T[F],
-    dateTo?: F extends "date" ? T[F] : never
+    val: F extends "date" ? IDateRange : T[F]
   ): T[] | null {
     let isEqual: (propVal: T[F]) => boolean;
-    if (propName === "date") {
-      isEqual = (propVal) => propVal >= val && propVal <= (dateTo as Date);
-    } else if (propName === "description") {
-      const regexp = new RegExp(val as string, "i");
-      isEqual = (propVal) => regexp.test(propVal as string);
-    } else {
-      isEqual = (propVal) => propVal === val;
+    switch (propName) {
+      case "date": {
+        const dateRange: IDateRange = val as IDateRange;
+        isEqual = (propVal) =>
+          propVal >= dateRange.dateFrom && propVal <= dateRange.dateTo;
+        break;
+      }
+      case "description": {
+        const regexp = new RegExp(val as string, "i");
+        isEqual = (propVal) => regexp.test(propVal as string);
+        break;
+      }
+      default:
+        isEqual = (propVal) => propVal === val;
+        break;
     }
 
     const keys = Object.keys(localStorage);

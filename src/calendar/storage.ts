@@ -21,8 +21,12 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     return this.storageName + "_" + id;
   }
 
-  getItem(id: number): T | null {
-    const item = localStorage.getItem(this.keyById(id));
+  getItem(idOrKey: number | string): T | null {
+    const item =
+      typeof idOrKey === "number"
+        ? localStorage.getItem(this.keyById(idOrKey))
+        : localStorage.getItem(idOrKey);
+
     return item === null
       ? null
       : JSON.parse(item, (key: string, value: string) => {
@@ -78,7 +82,7 @@ export default class Storage<T extends IEventRecord = IEventRecord> {
     );
     const result: T[] | null = [];
     for (const key of keys) {
-      const item = this.getItem(Number(key)) as T;
+      const item = this.getItem(key) as T;
       if (isEqual(item[propName])) {
         result.push(item);
       }
